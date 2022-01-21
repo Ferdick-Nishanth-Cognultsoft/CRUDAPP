@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   navlink:{
     color: 'white',
     textDecoration: 'none'
-  }
+  },
 }));
 
 export default function UserCreate() {
