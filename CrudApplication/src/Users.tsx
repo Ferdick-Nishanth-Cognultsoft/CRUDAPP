@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { makeStyles, styled, useTheme, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -19,6 +19,9 @@ import { Link } from "react-router-dom";
 import { IEmployee } from "./model/IEmployee";
 import UserUpdate from "./UserUpdate";
 import { useDelete, useFetch, usePost } from "./utility/apiHelper";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField, useMediaQuery } from "@material-ui/core";
+import { IEmployees } from "./model/IEmployees";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,14 +47,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+
 const UserList = () => {
   const classes = useStyles();
-  //const location = useHistory();
-  //const navigate = useNavigate();
   let navigate = useNavigate();
 
-  const [users, setUsers] = useState<IEmployee[]>([]);
+  const [open, setOpen] = React.useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
+  const [users, setUsers] = useState<IEmployee[]>([]);
   useEffect(() => {
     UserGetAll();
   }, []);
@@ -129,15 +140,17 @@ const UserList = () => {
                       <TableCell align="left">{r.companyName}</TableCell>
                       <TableCell align="left">{r.jobTitle}</TableCell>
                       <TableCell align="center">
-                        <Link to={`/userupdate/${r.id}`}>
-                          <Button variant='contained' color="primary"
-                            aria-label="outlined primary button group">Edit</Button>
-                        </Link>
+                        <Button variant="contained" color="primary"
+                          aria-label="outlined primary button group"
+                          onClick={handleClickOpen}>
+                          Edit
+                        </Button>
+                      </TableCell>
+                      <TableCell>
                         <Button variant='contained' color="primary"
-                          aria-label="outlined primary button group" onClick={() => { UserDelete(r.id); } }>Delete</Button>
+                          aria-label="outlined primary button group" onClick={() => { UserDelete(r.id); }}>Delete</Button>
                       </TableCell>
                     </TableRow></>
-                    //<UserUpdate Employee={users} />
                   )
                 })
                 }
@@ -146,6 +159,30 @@ const UserList = () => {
           </TableContainer>
         </Paper>
       </Container>
+      <Dialog
+        fullScreen={fullScreen}
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogTitle id="responsive-dialog-title">
+          {"Use Google's location service?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Let Google help apps determine location. This means sending anonymous
+            location data to Google, even when no apps are running.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleClose}>
+            Disagree
+          </Button>
+          <Button onClick={handleClose} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

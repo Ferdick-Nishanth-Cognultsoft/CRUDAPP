@@ -65,7 +65,7 @@ export default function CustomerCreate() {
       "place": place,
       "phoneNo": phoneNo
     }
-    await usePost<any>('Employees/Post', request).catch(() => {
+    await usePost<any>('Customers/Post', request).catch(() => {
       console.log("Something is Wrong");
     }).finally(() => {
       CustomerGetAll();
