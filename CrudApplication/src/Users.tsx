@@ -39,12 +39,28 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary,
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   table: {
     marginTop: '50px',
     align: "right",
     minWidth: 650
-  }
+  },
+
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
 }));
 
 
@@ -55,9 +71,22 @@ const UserList = () => {
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const handleClickOpen = () => {
+
+  const handleClickOpen = (id: any) => {
     setOpen(true);
+
+    (async () => {
+      await useFetch<any>(`Employees/GetById?Id=${id}`).then((user) => {
+        setUser(user.data);
+      }).catch(() => {
+        console.log("Something is Wrong");
+      }).finally(() => {
+      })
+    })()
   };
+
+  const [user, setUser] = useState<IEmployee[]>([]);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -67,6 +96,42 @@ const UserList = () => {
     UserGetAll();
   }, []);
 
+  const employee: IEmployees = {
+    firstName: "",
+    lastName: "",
+    companyName: "",
+    jobTitle: "",
+  }
+
+  const [employees, setEmployees] = useState(employee);
+  const { id } = useParams();
+
+  const handleChange = (event: any) => {
+    setEmployees(employees => ({
+      ...employees,
+      [event.target.name]: event.target.value
+    }));
+  }
+
+  const handleSubmit = (id: any) => {
+    (async () => {
+      let request = {
+        "id":id,
+        "firstName":employees.firstName, 
+        "lastName": employees.lastName,
+        "companyName"  : employees.companyName,
+        "jobTitle" : employees.jobTitle
+      }
+      await usePost<any>('Employees/Post', request).then((user) => {
+        setUsers(user.data);
+      }).catch(() => {
+        console.log("Something is Wrong");
+      }).finally(() => {
+        UserGetAll();
+      })
+    })()
+  }
+  
   const UserGetAll = () => {
     (async () => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -142,7 +207,7 @@ const UserList = () => {
                       <TableCell align="center">
                         <Button variant="contained" color="primary"
                           aria-label="outlined primary button group"
-                          onClick={handleClickOpen}>
+                          onClick={() => { handleClickOpen(r.id); }}>
                           Edit
                         </Button>
                       </TableCell>
@@ -166,22 +231,88 @@ const UserList = () => {
         aria-labelledby="responsive-dialog-title"
       >
         <DialogTitle id="responsive-dialog-title">
-          {"Use Google's location service?"}
+          {"User"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Let Google help apps determine location. This means sending anonymous
-            location data to Google, even when no apps are running.
+            <Container maxWidth="xs">
+              <div className={classes.paper}>
+              {user.map((user) => {
+                  return (
+                <form className={classes.form} onSubmit={handleSubmit}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        id="outlined-input"
+                        name="firstName"
+                        defaultValue={user.firstName}
+                        label="First Name"
+                        type="text"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        onChange={handleChange}
+                        autoFocus
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        id="outlined-input"
+                        name="lastName"
+                        defaultValue={user.lastName}
+                        label="Last Name"
+                        type="text"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        onChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        id="outlined-input"
+                        name="companyName"
+                        defaultValue={user.companyName}
+                        label="CompanyName"
+                        type="text"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        onChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        id="outlined-input"
+                        name="jobTitle"
+                        defaultValue={user.jobTitle}
+                        label="JobTitle"
+                        type="text"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        onChange={handleChange}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    onClick={() => { handleSubmit(user.id); }}
+                  >
+                    Update
+                  </Button>
+                </form>
+                )
+              })
+              }
+              </div>
+            </Container>
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleClose}>
-            Disagree
-          </Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
