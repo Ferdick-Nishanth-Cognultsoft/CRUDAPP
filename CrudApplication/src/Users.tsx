@@ -22,6 +22,7 @@ import { useDelete, useFetch, usePost } from "./utility/apiHelper";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField, useMediaQuery } from "@material-ui/core";
 import { IEmployees } from "./model/IEmployees";
 import axios from "axios";
+import EditEmployees from "./EditEmployees";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,70 +69,16 @@ const UserList = () => {
   const classes = useStyles();
   let navigate = useNavigate();
 
-  const [open, setOpen] = React.useState(false);
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleClickOpen = (id: any) => {
-    setOpen(true);
-
-    (async () => {
-      await useFetch<any>(`Employees/GetById?Id=${id}`).then((user) => {
-        setUser(user.data);
-      }).catch(() => {
-        console.log("Something is Wrong");
-      }).finally(() => {
-      })
-    })()
-  };
-
-  const [user, setUser] = useState<IEmployee[]>([]);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+  const [user, setUser] = useState<IEmployee>({});
   const [users, setUsers] = useState<IEmployee[]>([]);
+
   useEffect(() => {
     UserGetAll();
   }, []);
 
-  const employee: IEmployees = {
-    firstName: "",
-    lastName: "",
-    companyName: "",
-    jobTitle: "",
-  }
 
-  const [employees, setEmployees] = useState(employee);
-  const { id } = useParams();
-
-  const handleChange = (event: any) => {
-    setEmployees(employees => ({
-      ...employees,
-      [event.target.name]: event.target.value
-    }));
-  }
-
-  const handleSubmit = (id: any) => {
-    (async () => {
-      let request = {
-        "id":id,
-        "firstName":employees.firstName, 
-        "lastName": employees.lastName,
-        "companyName"  : employees.companyName,
-        "jobTitle" : employees.jobTitle
-      }
-      await usePost<any>('Employees/Post', request).then((user) => {
-        setUsers(user.data);
-      }).catch(() => {
-        console.log("Something is Wrong");
-      }).finally(() => {
-        UserGetAll();
-      })
-    })()
-  }
-  
   const UserGetAll = () => {
     (async () => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -154,7 +101,7 @@ const UserList = () => {
     })()
   }
 
-  const UsersGetId = (id: any) => {
+  /* const UsersGetId = (id: any) => {
     (async () => {
       await useFetch<any>(`Employees/GetById?Id=${id}`).then((user) => {
         setUsers(user.data);
@@ -164,6 +111,7 @@ const UserList = () => {
       })
     })()
   }
+ */
 
   return (
     <div className={classes.root}>
@@ -205,11 +153,7 @@ const UserList = () => {
                       <TableCell align="left">{r.companyName}</TableCell>
                       <TableCell align="left">{r.jobTitle}</TableCell>
                       <TableCell align="center">
-                        <Button variant="contained" color="primary"
-                          aria-label="outlined primary button group"
-                          onClick={() => { handleClickOpen(r.id); }}>
-                          Edit
-                        </Button>
+                        <EditEmployees employee={r}/>
                       </TableCell>
                       <TableCell>
                         <Button variant='contained' color="primary"
@@ -224,96 +168,7 @@ const UserList = () => {
           </TableContainer>
         </Paper>
       </Container>
-      <Dialog
-        fullScreen={fullScreen}
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="responsive-dialog-title"
-      >
-        <DialogTitle id="responsive-dialog-title">
-          {"User"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <Container maxWidth="xs">
-              <div className={classes.paper}>
-              {user.map((user) => {
-                  return (
-                <form className={classes.form} onSubmit={handleSubmit}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        id="outlined-input"
-                        name="firstName"
-                        defaultValue={user.firstName}
-                        label="First Name"
-                        type="text"
-                        required
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleChange}
-                        autoFocus
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        id="outlined-input"
-                        name="lastName"
-                        defaultValue={user.lastName}
-                        label="Last Name"
-                        type="text"
-                        required
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        id="outlined-input"
-                        name="companyName"
-                        defaultValue={user.companyName}
-                        label="CompanyName"
-                        type="text"
-                        required
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        id="outlined-input"
-                        name="jobTitle"
-                        defaultValue={user.jobTitle}
-                        label="JobTitle"
-                        type="text"
-                        required
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={() => { handleSubmit(user.id); }}
-                  >
-                    Update
-                  </Button>
-                </form>
-                )
-              })
-              }
-              </div>
-            </Container>
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+     
     </div>
   );
 }
