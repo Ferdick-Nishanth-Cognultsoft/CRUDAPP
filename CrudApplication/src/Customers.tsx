@@ -135,7 +135,7 @@ const CustomerList = () => {
                   <TableCell align="left">PhoneNo</TableCell>
                   <TableCell align="left">Action</TableCell>
                 </TableRow>
-              </TableHead>
+              </TableHead> 
               <TableBody>
                 {customers.map((c) => {
                   return (
