@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Button, Container, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import React, { useEffect, useState } from 'react'
-import { IEmployee } from './model/IEmployee';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField } from "@material-ui/core";
-import { useFetch, usePost } from './utility/apiHelper';
-import { useNavigate } from 'react-router-dom';
-import { IEmployees } from './model/IEmployees';
+import { Button, Container, Dialog, DialogContent, DialogContentText, DialogTitle, Grid, makeStyles, TextField, Typography, useMediaQuery, useTheme } from "@material-ui/core";
+import React, { useEffect } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ICustomer } from "./model/ICustomer";
+import { ICustomers } from "./model/ICustomers";
+import { useFetch, usePost } from "./utility/apiHelper";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
+const EditCustomers: React.FC<{ customer: ICustomer }> = (props) => {
 
     const classes = useStyles();
     let navigate = useNavigate();
@@ -56,8 +56,8 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    const [user, setUser] = useState<IEmployee[]>([]);
-    const [users, setUsers] = useState<IEmployee>({});
+    const [customer, setCustomer] = useState<ICustomer[]>([]);
+    const [customers1, setCustomers1] = useState<ICustomer>({});
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -77,26 +77,26 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
     };
 
     useEffect(() => {
-        UserGetAll();
+        CustomerGetAll();
     }, []);
 
-    var employeeDetails: IEmployees = {
-        id: props.employee?.id,
-        firstName: props.employee?.firstName,
-        lastName: props.employee?.lastName,
-        companyName: props.employee?.companyName,
-        jobTitle: props.employee?.jobTitle
+    var customerDetails: ICustomers = {
+        id: props.customer?.id,
+        customerName: props.customer?.customerName,
+        age: props.customer?.age,
+        place: props.customer?.place,
+        phoneNo: props.customer?.phoneNo
     }
 
-    const [employees, setEmployees] = useState(employeeDetails);
+    const [customers, setCustomers] = useState(customerDetails);
 
     // const { id } = useParams();
 
     const handleChange = (event: any) => {
         const name = event.target.name;
         console.log(name);
-        setEmployees({
-            ...employees,
+        setCustomers({
+            ...customers,
             [name]: event.target.value
         })
     }
@@ -104,25 +104,25 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
     const handleSubmit = () => {
         (async () => {
             let request = {
-                "id": employees.id,
-                "firstName": employees.firstName,
-                "lastName": employees.lastName,
-                "companyName": employees.companyName,
-                "jobTitle": employees.jobTitle
+                "id": customers.id,
+                "customerName": customers.customerName,
+                "age": customers.age,
+                "place": customers.place,
+                "phoneNo": customers.phoneNo
             }
-            await usePost<any>('Employees/UpdateEmployee', request).catch(() => {
+            await usePost<any>('Customers/UpdateCustomer', request).catch(() => {
                 console.log("Something is Wrong");
             }).finally(() => {
-                UserGetAll();
+                CustomerGetAll();
             })
         })()
     }
 
-    const UserGetAll = () => {
+    const CustomerGetAll = () => {
         (async () => {
             // eslint-disable-next-line react-hooks/rules-of-hooks
-            await useFetch<any>('Employees/GetAll').then((user) => {
-                setUsers(user.data);
+            await useFetch<any>('Customers/GetAll').then((customer) => {
+                setCustomers1(customer.data);
             }).catch(() => {
                 console.log("Something is Wrong");
             }).finally(() => {
@@ -145,7 +145,7 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
                 aria-labelledby="responsive-dialog-title"
             >
                 <DialogTitle id="responsive-dialog-title">
-                    {"User"}
+                    {"Customer"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -155,54 +155,50 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                                                id="outlined-input"
-                                                name="firstName"
-                                                defaultValue={employees.firstName}
-                                                label="First Name"
-                                                type="text"
+                                                name="customerName"
+                                                variant="outlined"
                                                 required
                                                 fullWidth
-                                                variant="outlined"
+                                                id="outlined-input"
+                                                label="Customer Name"
+                                                type="text"
+                                                defaultValue={customers.customerName}
                                                 onChange={handleChange}
                                                 autoFocus
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                                                id="outlined-input"
-                                                name="lastName"
-                                                defaultValue={employees.lastName}
-                                                label="Last Name"
-                                                type="text"
+                                                variant="outlined"
                                                 required
                                                 fullWidth
+                                                name="age"
+                                                id="outlined-input"
+                                                label="Age"
+                                                type="text"
+                                                defaultValue={customers.age}
+                                                onChange={handleChange}                                                       
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
                                                 variant="outlined"
+                                                required
+                                                fullWidth
+                                                id="place"
+                                                label="place"
+                                                defaultValue={customers.place}
                                                 onChange={handleChange}
                                             />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <TextField
-                                                id="outlined-input"
-                                                name="companyName"
-                                                defaultValue={employees.companyName}
-                                                label="CompanyName"
-                                                type="text"
+                                                variant="outlined"
                                                 required
                                                 fullWidth
-                                                variant="outlined"
-                                                onChange={handleChange}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                id="outlined-input"
-                                                name="jobTitle"
-                                                defaultValue={employees.jobTitle}
-                                                label="JobTitle"
-                                                type="text"
-                                                required
-                                                fullWidth
-                                                variant="outlined"
+                                                id="phoneNo"
+                                                label="PhoneNo"
+                                                defaultValue={customers.phoneNo}
                                                 onChange={handleChange}
                                             />
                                         </Grid>
@@ -227,4 +223,4 @@ const Editemployess: React.FC<{ employee: IEmployee }> = (props) => {
     )
 }
 
-export default Editemployess
+export default EditCustomers

@@ -23,6 +23,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, G
 import { IEmployees } from "./model/IEmployees";
 import axios from "axios";
 import EditEmployees from "./EditEmployees";
+import TablePagination from '@mui/material/TablePagination';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -73,6 +74,9 @@ const UserList = () => {
 
   const [user, setUser] = useState<IEmployee>({});
   const [users, setUsers] = useState<IEmployee[]>([]);
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   useEffect(() => {
     UserGetAll();
@@ -125,7 +129,7 @@ const UserList = () => {
             </Box>
             <Box>
               <Link to="/create">
-                <Button variant="contained" color="primary">
+                <Button component="h2" variant="contained" color="primary">
                   CREATE
                 </Button>
               </Link>
@@ -144,7 +148,8 @@ const UserList = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((r) => {
+                {(users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                ).map((r) => {
                   return (
                     <><TableRow>
                       <TableCell align="right">{r.id}</TableCell>
@@ -153,7 +158,7 @@ const UserList = () => {
                       <TableCell align="left">{r.companyName}</TableCell>
                       <TableCell align="left">{r.jobTitle}</TableCell>
                       <TableCell align="center">
-                        <EditEmployees employee={r}/>
+                        <EditEmployees employee={r} />
                       </TableCell>
                       <TableCell>
                         <Button variant='contained' color="primary"
@@ -168,7 +173,6 @@ const UserList = () => {
           </TableContainer>
         </Paper>
       </Container>
-     
     </div>
   );
 }

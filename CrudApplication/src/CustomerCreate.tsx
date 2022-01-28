@@ -39,7 +39,6 @@ export default function CustomerCreate() {
   const [phoneNo, setPhoneno] = useState('');
 
   const [customers, setCustomers] = useState<ICustomer[]>([]);
-  console.log(customerName)
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -65,7 +64,9 @@ export default function CustomerCreate() {
       "place": place,
       "phoneNo": phoneNo
     }
-    await usePost<any>('Customers/Post', request).catch(() => {
+    await usePost<any>('Customers/Post', request).then((customer) => {
+      setCustomers(customer.data);
+    }).catch(() => {
       console.log("Something is Wrong");
     }).finally(() => {
       CustomerGetAll();
