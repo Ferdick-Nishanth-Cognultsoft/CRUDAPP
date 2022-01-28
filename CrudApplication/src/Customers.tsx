@@ -153,7 +153,8 @@ const CustomerList = () => {
                           <Button variant='contained' color="primary"
                             aria-label="outlined primary button group" onClick={() => { CustomerDelete(c.id); }}>Delete</Button>
                         </TableCell>
-                      </TableRow></>
+                      </TableRow>
+                      </>
                   )
                 })
                 }
