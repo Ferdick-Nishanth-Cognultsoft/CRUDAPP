@@ -63,6 +63,15 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  searchBox: {
+    borderRadius: 30,
+    border: '2px, blue solid',
+    width: '120%',
+    height: '35px',
+    boxShadow: 'rgba(100, 100, 111, 0.5) 0px 7px 29px 0px',
+    fontSize: 16,
+    textIndent: '10px'
+  }
 }));
 
 
@@ -78,15 +87,33 @@ const UserList = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+  const [searchemployee, setsearchemployee] = useState<string>('');
+
+  const search = (e: any) => {
+    setsearchemployee(e);
+  }
+
   useEffect(() => {
     UserGetAll();
   }, []);
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const UserGetAll = () => {
     (async () => {
+      let request = {
+        "search": searchemployee.trimStart().trimEnd() ?? ""
+      }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      await useFetch<any>('Employees/GetAll').then((user) => {
+      await usePost<IEmployee[]>('Employees/GetAll', request).then((user) => {
         setUsers(user.data);
       }).catch(() => {
         console.log("Something is Wrong");
@@ -122,10 +149,19 @@ const UserList = () => {
       <Container className={classes.container} maxWidth="lg">
         <Paper className={classes.paper}>
           <Box display="flex">
-            <Box flexGrow={1}>
+            <Box flexGrow={1} textAlign="left">
               <Typography component="h2" variant="h6" color="primary" gutterBottom>
                 Employees
               </Typography>
+            </Box>
+            <Box>
+              <input value={searchemployee}
+                type='text' placeholder="Search here"
+                className={classes.searchBox}
+                onChange={e => search(e.target.value)}
+                onKeyPress={event => { if (event.key === 'Enter') { UserGetAll(); } }}
+                maxLength={255}
+              />
             </Box>
             <Box>
               <Link to="/create">
@@ -148,29 +184,54 @@ const UserList = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ).map((r) => {
-                  return (
-                    <><TableRow>
-                      <TableCell align="right">{r.id}</TableCell>
-                      <TableCell align="left">{r.firstName}</TableCell>
-                      <TableCell align="left">{r.lastName}</TableCell>
-                      <TableCell align="left">{r.companyName}</TableCell>
-                      <TableCell align="left">{r.jobTitle}</TableCell>
-                      <TableCell align="center">
-                        <EditEmployees employee={r} />
-                      </TableCell>
-                      <TableCell>
-                        <Button variant='contained' color="primary"
-                          aria-label="outlined primary button group" onClick={() => { UserDelete(r.id); }}>Delete</Button>
-                      </TableCell>
-                    </TableRow></>
-                  )
-                })
+                {users
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((r) => {
+                    return (
+                      <>
+                        <TableRow>
+                          <TableCell align="right">{r.id}</TableCell>
+                          <TableCell align="left">{r.firstName}</TableCell>
+                          <TableCell align="left">{r.lastName}</TableCell>
+                          <TableCell align="left">{r.companyName}</TableCell>
+                          <TableCell align="left">{r.jobTitle}</TableCell>
+                          <TableCell align="center">
+                            <EditEmployees employee={r} />
+                          </TableCell>
+                          <TableCell>
+                            <Button variant='contained' color="primary"
+                              aria-label="outlined primary button group" onClick={() => { UserDelete(r.id); setOpen(true)}}>Delete</Button>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    )
+                  })
                 }
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Delete"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you sure you want to delete?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>No</Button>
+              <Button onClick={handleClose} autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Paper>
       </Container>
     </div>

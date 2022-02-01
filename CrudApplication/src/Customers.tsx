@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { ICustomer } from "./model/ICustomer";
 import { useDelete, useFetch } from "./utility/apiHelper";
 import EditCustomers from "./EditCustomers";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,10 +69,21 @@ const CustomerList = () => {
 
   const [customer, setCustomer] = useState<ICustomer>({});
   const [customers, setCustomers] = useState<ICustomer[]>([]);
+  conct []
 
   useEffect(() => {
     CustomersGet()
   }, [])
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const CustomersGet = () => {
     (async () => {
@@ -135,7 +147,7 @@ const CustomerList = () => {
                   <TableCell align="left">PhoneNo</TableCell>
                   <TableCell align="left">Action</TableCell>
                 </TableRow>
-              </TableHead> 
+              </TableHead>
               <TableBody>
                 {customers.map((c) => {
                   return (
@@ -151,16 +163,39 @@ const CustomerList = () => {
                         </TableCell>
                         <TableCell>
                           <Button variant='contained' color="primary"
-                            aria-label="outlined primary button group" onClick={() => { CustomerDelete(c.id); }}>Delete</Button>
+                            aria-label="outlined primary button group" onClick={() => { setOpen(true); CustomerDelete(c.id); }}>Delete</Button>
                         </TableCell>
                       </TableRow>
-                      </>
+                    </>
                   )
                 })
                 }
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Delete"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you sure you want to delete?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>No</Button>
+              <Button onClick={handleClose} autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
+
         </Paper>
       </Container>
     </div>
