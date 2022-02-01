@@ -69,8 +69,6 @@ const CustomerList = () => {
 
   const [customer, setCustomer] = useState<ICustomer>({});
   const [customers, setCustomers] = useState<ICustomer[]>([]);
-  conct []
-
   useEffect(() => {
     CustomersGet()
   }, [])
