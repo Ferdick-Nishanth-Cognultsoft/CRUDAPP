@@ -77,7 +77,7 @@ const EditCustomers: React.FC<{ customer: ICustomer }> = (props) => {
     };
 
     useEffect(() => {
-        CustomerGetAll();
+        CustomerGetAll(); 
     }, []);
 
     var customerDetails: ICustomers = {
