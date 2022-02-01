@@ -124,7 +124,7 @@ const EditCustomers: React.FC<{ customer: ICustomer }> = (props) => {
             await useFetch<any>('Customers/GetAll').then((customer) => {
                 setCustomers1(customer.data);
             }).catch(() => {
-                console.log("Something is Wrong");
+                console.log("Something is Wrong , Need to check the Get Call");
             }).finally(() => {
             })
         })()
